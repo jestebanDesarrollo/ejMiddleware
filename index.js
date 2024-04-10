@@ -24,15 +24,24 @@ function buscarProd(id){
     return prods.find(prod => prod.id === id);
 }
 
-let mcod = 1
+//let mid = 15
 let buscarProd1 = (req, res, next) => {
-    if (prods.find(prod => prod.id === 1)){
+    if (buscarProd(parseInt(req.params.id))){
         next()
     }else{
         res.status(401).send('No autorizado por buscarProd1')
-        //next(new Error('No autorizado'))
+        next(new Error('No autorizado por buscadorProd1'))
     }
 }
+
+let buscarProd2 = (id) => (async (req,res, next) => {
+    if(buscarProd(id)){
+        next();
+    } else {
+        res.send({mesg:"No puede acceder a este endPoint"})
+    }
+
+})
 
 app.use(express.urlencoded({extended: true}));
 
@@ -63,8 +72,7 @@ app.use((req, res, next) => {
 })
 
 app.use(async(req, res, next) => {
-    let prod = await buscarProd(1)
-
+    let prod = await buscarProd(2)
     if(prod){
         next()
     }else{
@@ -81,8 +89,13 @@ app.get('/home', (req, res) => {
     res.send('Home')
 })
 
-app.get('/buscarprod1',buscarProd1, (req, res) =>{
+app.get('/buscarprod1/:id',buscarProd1, (req, res) =>{
     res.send("Ingresado a endPoint buscarprod1")
+})
+
+let myid = 3
+app.get('/buscarProd2',buscarProd2(myid),(req, res) => {
+    res.send("Ingresando a endPoint buscarprod2")
 })
 
 app.listen(port, () => {
